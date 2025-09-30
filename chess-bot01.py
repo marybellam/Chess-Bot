@@ -59,13 +59,15 @@ def bot_play():
     
 # Player's turn
 def human_play():
-    legal_moves = list(ChessBot.board.legal_moves)
+    legal_moves = list(board.legal_moves)
+    print("Legal moves: ", legal_moves)
     move = input("Your move: ")
-    while move not in legal_moves:
-        print("Enter a valid move.")
-        move = input("Your move: ")
-    print(move.uci())
-    ChessBot.board.push(move)
+    #while move not in legal_moves:
+    #    print("Enter a valid move.")
+    #    move = input("Your move: ")
+    print("Human plays: " + move)
+    ChessBot.board.push_uci(move)
+    print(ChessBot.board)
 
 # Gameplay
 def game():
