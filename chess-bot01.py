@@ -51,7 +51,6 @@ def board_start_pos():
 # Bot's turn
 def bot_play():
     ChessBot.board.legal_moves.count()
-    #take if possible needs to be added
     legal_moves = list(ChessBot.board.legal_moves)
     captures = [move for move in legal_moves if ChessBot.board.is_capture(move)]
     #captures = []
@@ -62,9 +61,12 @@ def bot_play():
         #print("Captures available: ", captures)
         num = random.randint(0, len(captures) - 1)
         move = captures[num]
+        #move = random.choice(captures)
     else:
         num = random.randint(0, ChessBot.board.legal_moves.count() - 1)
         move = legal_moves[num]
+        #move = random.choice(legal_moves)
+
     print (move.uci())
     ChessBot.board.push(move)
     
