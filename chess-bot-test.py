@@ -31,7 +31,6 @@ def computer_player():
             break
         else:
             print("Enter a valid character.")
-    #print("You entered: " + ChessBot.bot_play)
 
 # Method to choose start position
 def board_start_pos():
@@ -51,13 +50,8 @@ def board_start_pos():
 # Bot's turn
 def bot_play():
     ChessBot.board.legal_moves.count()
-    #take if possible needs to be added
     legal_moves = list(ChessBot.board.legal_moves)
     captures = [move for move in legal_moves if ChessBot.board.is_capture(move)]
-    #captures = []
-    #for i in range(ChessBot.board.legal_moves.count() - 1):
-    #    if ChessBot.board.is_capture(legal_moves[i]) == True:
-    #        captures.append(legal_moves[i])
     if len(captures) > 0:
         #print("Captures available: ", captures)
         num = random.randint(0, len(captures) - 1)
@@ -65,18 +59,20 @@ def bot_play():
     else:
         num = random.randint(0, ChessBot.board.legal_moves.count() - 1)
         move = legal_moves[num]
+
     print (move.uci())
     ChessBot.board.push(move)
     
 # Player's turn
 def human_play():
     legal_moves = list(ChessBot.board.legal_moves)
-    #print("Legal moves: ", legal_moves)
+    print("Legal moves: ", legal_moves)
     move = input("Your move: ")
     while move not in [m.uci() for m in legal_moves]:
         print("Enter a valid move.")
         move = input("Your move: ")
     ChessBot.board.push_uci(move)
+    print("check")
     print(ChessBot.board)
 
 # Gameplay
@@ -89,15 +85,14 @@ def game():
                 print("Bot (as white): ")
                 bot_play()
             else:
-                #move = input("Your move (as white): ")
-                human_play()
+                bot_play()
             print("New FEN position: " + ChessBot.board.fen())
         else:
             if ChessBot.bot_play == "b":
                 print("Bot (as black): ")
+                bot_play()
             else:
-                #move = input("Your move (as black): ")
-                human_play()
+                bot_play()
             print("New FEN position: " + ChessBot.board.fen())
         if ChessBot.board.is_game_over():
             break
@@ -112,7 +107,6 @@ def play():
 
 # Main method
 def main():
-    chess_bot = ChessBot()
     play()
     
 if __name__ == "__main__":

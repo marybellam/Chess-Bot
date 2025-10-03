@@ -31,7 +31,6 @@ def computer_player():
             break
         else:
             print("Enter a valid character.")
-    #print("You entered: " + ChessBot.bot_play)
 
 # Method to choose start position
 def board_start_pos():
@@ -53,19 +52,13 @@ def bot_play():
     ChessBot.board.legal_moves.count()
     legal_moves = list(ChessBot.board.legal_moves)
     captures = [move for move in legal_moves if ChessBot.board.is_capture(move)]
-    #captures = []
-    #for i in range(ChessBot.board.legal_moves.count() - 1):
-    #    if ChessBot.board.is_capture(legal_moves[i]) == True:
-    #        captures.append(legal_moves[i])
     if len(captures) > 0:
         #print("Captures available: ", captures)
         num = random.randint(0, len(captures) - 1)
         move = captures[num]
-        #move = random.choice(captures)
     else:
         num = random.randint(0, ChessBot.board.legal_moves.count() - 1)
         move = legal_moves[num]
-        #move = random.choice(legal_moves)
 
     print (move.uci())
     ChessBot.board.push(move)
@@ -92,7 +85,6 @@ def game():
                 print("Bot (as white): ")
                 bot_play()
             else:
-                #move = input("Your move (as white): ")
                 human_play()
             print("New FEN position: " + ChessBot.board.fen())
         else:
@@ -100,7 +92,6 @@ def game():
                 print("Bot (as black): ")
                 bot_play()
             else:
-                #move = input("Your move (as black): ")
                 human_play()
             print("New FEN position: " + ChessBot.board.fen())
         if ChessBot.board.is_game_over():
