@@ -79,6 +79,7 @@ def human_play():
         print("Enter a valid move.")
         move = input("Your move: ")
     ChessBot.board.push_uci(move)
+    print("check")
     print(ChessBot.board)
 
 # Gameplay
@@ -97,6 +98,7 @@ def game():
         else:
             if ChessBot.bot_play == "b":
                 print("Bot (as black): ")
+                bot_play()
             else:
                 #move = input("Your move (as black): ")
                 human_play()
@@ -114,7 +116,6 @@ def play():
 
 # Main method
 def main():
-    chess_bot = ChessBot()
     play()
     
 if __name__ == "__main__":
