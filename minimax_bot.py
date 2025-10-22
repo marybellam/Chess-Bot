@@ -84,31 +84,31 @@ piece_values = {
     chess.KING: 0
     }
 
-def shallow_minmax(self):
+def shallow_minmax():
     best_score = float('-inf')
     score = int(0)
     best_move = None
         
-    for moveWhite in self.board.legal_moves: #for each white move
-        whitePiece = self.board.piece_at(moveWhite.to_square) #gets the value of piece going to be captured or none
+    for moveWhite in ChessBot.board.legal_moves: #for each white move
+        whitePiece = ChessBot.board.piece_at(moveWhite.to_square) #gets the value of piece going to be captured or none
         valueofWhiteMove = 0
         if whitePiece != None:
-            valueofWhiteMove = self.piece_values[whitePiece.piece_type] #if piece going to be captures get value
-        self.board.push(moveWhite)
-        for moveBlack in self.board.legal_moves:
+            valueofWhiteMove = piece_values[whitePiece.piece_type] #if piece going to be captures get value
+        ChessBot.board.push(moveWhite)
+        for moveBlack in ChessBot.board.legal_moves:
             score = 0
-            blackPiece = self.board.piece_at(moveBlack.to_square)
+            blackPiece = ChessBot.board.piece_at(moveBlack.to_square)
             valueofBlackMove = 0
             if blackPiece != None:
-                valueofBlackMove = self.piece_values[blackPiece.piece_type]
+                valueofBlackMove = piece_values[blackPiece.piece_type]
             score = valueofWhiteMove - valueofBlackMove
             if(score > best_score):
                 best_score = score
                 best_move = moveWhite
-        self.board.pop()
+        ChessBot.board.pop()
         if best_move != None:
             print(best_move.uci())
-            self.board.push(best_move)
+            ChessBot.board.push(best_move)
     print("ERROR: NO MOVE MADE")
 
     def calculate_score(self):
@@ -149,7 +149,7 @@ def game():
         if (ChessBot.board.turn == True):
             if bot_play == "w":
                 print("Bot (as white): ")
-                bot_play()
+                shallow_minmax()
             else:
                 human_play()
             print("New FEN position: " + ChessBot.board.fen())
