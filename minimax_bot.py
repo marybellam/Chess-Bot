@@ -1,6 +1,7 @@
 from datetime import datetime
 import chess
 import random
+import math
 
 # Chess Bot class
 class ChessBot:
@@ -78,19 +79,32 @@ class ChessBot:
         chess.KING: 0
     }
 
-    def shallow_minimax(self):
+    def shallow_minmax(self):
         best_score = float('-inf')
-        score = float('-inf')
+        score = int(0)
         best_move = None
         
-        for i in self.board.legal_moves:
-            if self.board.is_capture(i):
-                score += i
-            self.board.push(i)
-            for j in self.board.legal_moves:
-                if self.board.is_capture(j):
-                    score -= j
-                    
+        for moveWhite in self.board.legal_moves: #for each white move
+            whitePiece = self.board.piece_at(moveWhite.to_square) #gets the value of piece going to be captured or none
+            valueofWhiteMove = 0
+            if whitePiece != None:
+                valueofWhiteMove = self.piece_values[whitePiece.piece_type] #if piece going to be captures get value
+            self.board.push(moveWhite)
+            for moveBlack in self.board.legal_moves:
+                score = 0
+                blackPiece = self.board.piece_at(moveBlack.to_square)
+                valueofBlackMove = 0
+                if blackPiece != None:
+                    valueofBlackMove = self.piece_values[blackPiece.piece_type]
+                score = valueofWhiteMove - valueofBlackMove
+                if(score > best_score):
+                    best_score = score
+                    best_move = moveWhite
+            self.board.pop()
+            if best_move != None:
+                print(best_move.uci())
+                self.board.push(best_move)
+        print("ERROR: NO MOVE MADE")
 
     def calculate_score(self):
         score = 0
