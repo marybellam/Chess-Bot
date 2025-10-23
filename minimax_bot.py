@@ -137,7 +137,7 @@ class ChessBot:
         best_score = float('inf')
         best_move = None
         
-        for move in self.board.legal_moves: #for each white move
+        for move in list(self.board.legal_moves): #for each white move
             self.board.push(move)
             score,_ = self.Max(board, depth-1)
             if(score < best_score):
@@ -153,7 +153,7 @@ class ChessBot:
         best_score = float('-inf')
         best_move = None
         
-        for move in self.board.legal_moves: #for each white move
+        for move in list(self.board.legal_moves): #for each white move
             self.board.push(move)
             score,_ = self.Min(board, depth-1)
             if(score > best_score):
