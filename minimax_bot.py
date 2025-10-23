@@ -104,7 +104,7 @@ def shallow_minmax():
                 valueofBlackMove = piece_values[captured_white.piece_type]
             score = valueofWhiteMove - valueofBlackMove
             #print("score",score)
-            if score < worst_black_score: #gets lowest score/worst for white score
+            if score < worst_black_score: #gets lowest score/worst for white score/best for black
                 worst_black_score = score
         
         if(worst_black_score > best_score):
@@ -119,53 +119,71 @@ def shallow_minmax():
     else:
         print("ERROR: NO MOVE MADE")
 
-    def calculate_score(self):
-        score = 0
-        for piece_type in self.piece_values:
-            score += len(self.board.pieces(piece_type, chess.WHITE)) * self.piece_values[piece_type] 
-            score -= len(self.board.pieces(piece_type, chess.BLACK)) * self.piece_values[piece_type]
-        return score
-
-    def search(self):
-        if self.board.is_checkmate(): 
-            if self.board.turn == (self.bot_color == "w"): 
-                return -9999
+def evalBoard(board):
+    score =0
+    for square in chess.SQUARES:
+        piece = ChessBot.board.piece_at(square)
+        if piece is not None:
+            val = piece_values[piece.piece_type]
+            if piece.color == chess.WHITE:
+                score += val
             else:
-                return 9999
-        if self.board.is_stalemate(): 
-            return 0
+                score -= val
+    return score
+
+def Min(board,depth):
+    if depth == 0 or board.is_game_over():
+        return evalBoard(board), None
+    best_score = float('inf')
+    best_move = None
         
-        best_score = float('-inf')
-        best_move = None
-
-        for move in self.board.legal_moves:
-            self.board.push(move)
-            score = self.calculate_score()
-            self.board.pop()
-
-            if score > best_score:
-                best_score = score
-                best_move = move
-
-        return best_move
-
+    for move in board.legal_moves: #for each white move
+        board.push(move)
+        score,_ = Max(board, depth-1)
+        if(score < best_score):
+            best_score = score
+            best_move = move
+        board.pop()
+    return best_score, best_move
+    
+def Max(board,depth):
+    if depth == 0 or board.is_game_over():
+        return evalBoard(board), None
+    best_score = float('-inf')
+    best_move = None
+        
+    for move in board.legal_moves: #for each white move
+        board.push(move)
+        score,_ = Min(board, depth-1)
+        if(score > best_score):
+            best_score = score
+            best_move = move
+        board.pop()
+    return best_score, best_move
+    
     # Gameplay
 def game():
     while not ChessBot.board.is_game_over():
         print(ChessBot.board)
-        print(ChessBot.bot_color)
-        move = str
         if (ChessBot.board.turn == True):
             if ChessBot.bot_color == "w":
                 print("Bot (as white): ")
-                shallow_minmax()
+                score,move = Max(ChessBot.board,2)
+                if move == None:
+                    print("ERROR")
+                else:
+                    ChessBot.board.push(move)
             else:
                 human_play()
             print("New FEN position: " + ChessBot.board.fen())
         else:
             if ChessBot.bot_color == "b":
                 print("Bot (as black): ")
-                bot_play()
+                score,move = Max(ChessBot.board,2)
+                if move == None:
+                    print("ERROR")
+                else:
+                    ChessBot.board.push(move)
             else:
                 human_play()
             print("New FEN position: " + ChessBot.board.fen())
