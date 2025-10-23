@@ -26,8 +26,8 @@ def computer_player():
     while True:
         bot_play = input("Computer Player? (w=white/b=black): ").lower()
         if bot_play == "w" or bot_play == "b":
-            bot_color = bot_play
-            print (bot_color)
+            ChessBot.bot_color = bot_play
+            print(ChessBot.bot_color)
             break
         else:
             print("Enter a valid character.")
@@ -50,18 +50,17 @@ def board_start_pos():
     # Bot's turn
 def bot_play():
     ChessBot.board.legal_moves.count()
-    legal_moves = list(self.board.legal_moves)
-    captures = [move for move in legal_moves if self.board.is_capture(move)]
+    legal_moves = list(ChessBot.board.legal_moves)
+    captures = [move for move in legal_moves if ChessBot.board.is_capture(move)]
     if len(captures) > 0:
         #print("Captures available: ", captures)
         num = random.randint(0, len(captures) - 1)
         move = captures[num]
     else:
-        num = random.randint(0, self.board.legal_moves.count() - 1)
+        num = random.randint(0, ChessBot.board.legal_moves.count() - 1)
         move = legal_moves[num]
-
     print (move.uci())
-    self.board.push(move)
+    ChessBot.board.push(move)
         
     # Player's turn
 def human_play():
@@ -88,28 +87,37 @@ def shallow_minmax():
     best_score = float('-inf')
     score = int(0)
     best_move = None
+    print("doing minmax")
         
     for moveWhite in ChessBot.board.legal_moves: #for each white move
-        whitePiece = ChessBot.board.piece_at(moveWhite.to_square) #gets the value of piece going to be captured or none
+        captured_piece = ChessBot.board.piece_at(moveWhite.to_square) #gets the value of piece going to be captured or none
         valueofWhiteMove = 0
-        if whitePiece != None:
-            valueofWhiteMove = piece_values[whitePiece.piece_type] #if piece going to be captures get value
+        if captured_piece != None:
+            valueofWhiteMove = piece_values[captured_piece.piece_type] #if piece going to be captures get value
+        #print("move white" , moveWhite)
         ChessBot.board.push(moveWhite)
+        worst_black_score = float('inf')        
         for moveBlack in ChessBot.board.legal_moves:
-            score = 0
-            blackPiece = ChessBot.board.piece_at(moveBlack.to_square)
-            valueofBlackMove = 0
-            if blackPiece != None:
-                valueofBlackMove = piece_values[blackPiece.piece_type]
+            captured_white = ChessBot.board.piece_at(moveBlack.to_square)
+            valueofBlackMove = 0 #have to assume best move
+            if captured_white != None:
+                valueofBlackMove = piece_values[captured_white.piece_type]
             score = valueofWhiteMove - valueofBlackMove
-            if(score > best_score):
-                best_score = score
-                best_move = moveWhite
-        ChessBot.board.pop()
-        if best_move != None:
-            print(best_move.uci())
-            ChessBot.board.push(best_move)
-    print("ERROR: NO MOVE MADE")
+            #print("score",score)
+            if score < worst_black_score: #gets lowest score/worst for white score
+                worst_black_score = score
+        
+        if(worst_black_score > best_score):
+            best_score = worst_black_score
+            best_move = moveWhite
+        ChessBot.board.pop() #undo white move
+        
+    if best_move != None:
+        print(ChessBot.board)
+        print(best_move.uci())
+        ChessBot.board.push(best_move)
+    else:
+        print("ERROR: NO MOVE MADE")
 
     def calculate_score(self):
         score = 0
@@ -145,16 +153,17 @@ def shallow_minmax():
 def game():
     while not ChessBot.board.is_game_over():
         print(ChessBot.board)
+        print(ChessBot.bot_color)
         move = str
         if (ChessBot.board.turn == True):
-            if bot_play == "w":
+            if ChessBot.bot_color == "w":
                 print("Bot (as white): ")
                 shallow_minmax()
             else:
                 human_play()
             print("New FEN position: " + ChessBot.board.fen())
         else:
-            if bot_play == "b":
+            if ChessBot.bot_color == "b":
                 print("Bot (as black): ")
                 bot_play()
             else:
