@@ -5,6 +5,7 @@ import math
 
 # Chess Bot class
 class ChessBot:
+
     piece_values = {
     chess.PAWN: 1,
     chess.KNIGHT: 3,
@@ -118,8 +119,63 @@ class ChessBot:
         else:
             print("ERROR: no move made")
 
-    def evalBoard(self,board):
-        score =0
+    def calculate_score(self):
+        score = 0
+        for piece_type in self.piece_values:
+            score += len(self.board.pieces(piece_type, chess.WHITE)) * self.piece_values[piece_type] 
+            score -= len(self.board.pieces(piece_type, chess.BLACK)) * self.piece_values[piece_type]
+
+        if self.bot_color == 'b':
+            score = -score
+        return score
+
+    # Full minimax
+    # def search(self, depth, min_or_max):
+    #     if depth == 0 or self.board.is_game_over():
+    #         return self.calculate_score()
+
+    #     if min_or_max == True:
+    #         best_score = float('-inf')
+    #         for move in list(self.board.legal_moves):
+    #             self.board.push(move)
+    #             score = self.search(depth-1, False)
+    #             self.board.pop()
+
+    #             if score > best_score:
+    #                 best_score = score
+
+    #         return best_score
+        
+    #     else:
+    #         best_score = float('inf')
+    #         for move in list(self.board.legal_moves):
+    #             self.board.push(move)
+    #             score = self.search(depth-1, True)
+    #             self.board.pop()
+
+    #             if score < best_score:
+    #                 best_score = score
+
+    #         return best_score
+        
+    # def make_move(self, depth):
+    #     best_score = float('-inf')
+    #     best_move = None
+
+    #     for move in list(self.board.legal_moves):
+    #         self.board.push(move)
+    #         score = self.search(depth - 1, False)
+    #         self.board.pop()
+    #         if score > best_score:
+    #             best_score = score
+    #             best_move = move
+    
+    #     if best_move:
+    #         self.board.push(best_move)
+    #         print(best_move.uci())
+
+    def evalBoard(self):
+        score = 0
         for square in chess.SQUARES:
             piece = self.board.piece_at(square)
             if piece is not None:
@@ -129,59 +185,57 @@ class ChessBot:
                 else:
                     score -= val
         return score
-    
-    def Min(self,board,depth):
+
+    def Min(self, depth):
         if depth == 0 or self.board.is_game_over():
-            eval_score = self.evalBoard(board)
-            return (eval_score if self.bot_color == "w" else -eval_score), None
+            return self.evalBoard(self.board), None
         best_score = float('inf')
         best_move = None
-        
+            
         for move in self.board.legal_moves: #for each white move
             self.board.push(move)
-            score,_ = self.Max(board, depth-1)
+            score,_ = self.Max(self.board, depth-1)
             if(score < best_score):
                 best_score = score
                 best_move = move
             self.board.pop()
         return best_score, best_move
-    
-    def Max(self,board,depth):
+        
+    def Max(self, depth):
         if depth == 0 or self.board.is_game_over():
-            eval_score = self.evalBoard(board)
-            return (eval_score if self.bot_color == "w" else -eval_score), None
+            return self.evalBoard(self.board), None
         best_score = float('-inf')
         best_move = None
-        
+            
         for move in self.board.legal_moves: #for each white move
             self.board.push(move)
-            score,_ = self.Min(board, depth-1)
+            score,_ = self.Min(self.board, depth-1)
             if(score > best_score):
                 best_score = score
                 best_move = move
             self.board.pop()
         return best_score, best_move
-    
+
     # Gameplay
     def game(self):
         while not self.board.is_game_over():
             print(self.board)
-            print(self.bot_color)
+            move = str
             if (self.board.turn == True):
                 if self.bot_color == "w":
                     print("Bot (as white): ")
-                    score,move = self.Max(self.board,2)
+                    score,move = self.Max(2)
                     if move == None:
                         print("ERROR")
                     else:
                         self.board.push(move)
-                else:        
+                else:
                     self.human_play()
-                print("New FEN position: " + self.board.fen())
+                print("New FEN position: " + ChessBot.board.fen())
             else:
                 if self.bot_color == "b":
                     print("Bot (as black): ")
-                    score,move = self.Max(self.board,2)
+                    score,move = self.Max(2)
                     if move == None:
                         print("ERROR")
                     else:
@@ -193,7 +247,8 @@ class ChessBot:
                 break
 
         print("Game over: ", self.board.result()) # result
- 
+
+    
     # Set up game
     def play(self):
         self.today()
