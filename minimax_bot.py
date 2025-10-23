@@ -174,6 +174,7 @@ class ChessBot:
                     if move == None:
                         print("ERROR")
                     else:
+                        print(move.uci())
                         self.board.push(move)
                 else:        
                     self.human_play()
@@ -185,6 +186,7 @@ class ChessBot:
                     if move == None:
                         print("ERROR")
                     else:
+                        print(move.uci())
                         self.board.push(move)
                 else:
                     self.human_play()
