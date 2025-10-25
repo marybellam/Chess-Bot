@@ -100,28 +100,23 @@ class ChessBot:
                     value_black = self.piece_values[black_capture.piece_type]
                 else:
                     value_black = 0
-                    
                 score = value_white - value_black
-
                 if score < worst_black_score: #gets lowest score/worst for white score
                     worst_black_score = score
-            
             if(worst_black_score > best_score):
                 best_score = worst_black_score
                 best_move = white_move
-
             self.board.pop()
-
         if best_move:
             print(best_move.uci())
             self.board.push(best_move)
         else:
             print("ERROR: no move made")
 
-    def evalBoard(self,board):
-        score =0
+    def evalBoard(self, board): 
+        score = 0
         for square in chess.SQUARES:
-            piece = self.board.piece_at(square)
+            piece = self.board.piece_at(square)  # Keep using self.board
             if piece is not None:
                 val = self.piece_values[piece.piece_type]
                 if piece.color == chess.WHITE:
@@ -166,7 +161,6 @@ class ChessBot:
     def game(self):
         while not self.board.is_game_over():
             print(self.board)
-            print(self.bot_color)
             if (self.board.turn == True):
                 if self.bot_color == "w":
                     print("Bot (as white): ")
