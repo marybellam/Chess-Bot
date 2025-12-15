@@ -1,6 +1,7 @@
 from datetime import datetime
 import chess
 import math
+from chess import Move
 
 # Chess Bot class
 class ChessBot:
@@ -78,10 +79,12 @@ class ChessBot:
                     score -= val
         return score
     
-    def Min(self,depth:int):
+    def Min(self,depth:int,alpha:float, beta:float)-> tuple[int|float, Move|None]:
         """ Gets min of opponent's turn"""
         if self.board.is_checkmate():
-            return math.inf,None
+            #losing = ((self.board.turn and self.bot_color == "w") or (not self.board.turn and self.bot_color == "b"))
+            #return (-math.inf if losing else math.inf), None
+            return math.inf, None 
         if depth == 0 or self.board.is_game_over():
             eval_score = self.evalBoard()
             if self.bot_color == "b":
@@ -92,17 +95,23 @@ class ChessBot:
         best_move = None
         for move in self.board.legal_moves: 
             self.board.push(move)
-            score,_ = self.Max(depth-1)
+            score,_ = self.Max(depth-1, alpha, beta)
             self.board.pop()
             if(score < best_score):
                 best_score = score
                 best_move = move
+                if best_score < beta:
+                    beta = best_score #new min
+                if beta <= alpha:
+                    break #stop searching
         return best_score, best_move
     
-    def Max(self,depth:int):
+    def Max(self,depth:int, alpha:float, beta:float) -> tuple[int|float, Move|None]:
         """Gets max of plater/bots turn"""
         if self.board.is_checkmate():
-            return -math.inf,None #lost
+            #losing = ((self.board.turn and self.bot_color == "w") or (not self.board.turn and self.bot_color == "b"))
+            #return (-math.inf if losing else math.inf),None #lost
+            return -math.inf, None
         if depth == 0 or self.board.is_game_over():
             eval_score = self.evalBoard()
             if self.bot_color == "b":
@@ -111,14 +120,17 @@ class ChessBot:
             #return (eval_score if self.bot_color == "w" else -eval_score), None
         best_score = -math.inf
         best_move = None
-        
         for move in self.board.legal_moves: 
             self.board.push(move)
-            score,_ = self.Min(depth-1)
+            score,_ = self.Min(depth-1, alpha, beta)
             self.board.pop()
             if(score > best_score):
                 best_score = score
                 best_move = move
+                if best_score > alpha:
+                    alpha = best_score #alpha is max, found amove tha
+                if beta <= alpha: 
+                    break #stop searching, min won't chose this        
         return best_score, best_move
     
     def game(self):
@@ -133,7 +145,7 @@ class ChessBot:
                 if self.bot_color == "b":
                     color_name = "black"
                 print("Bot (as",color_name,"): ") 
-                _,move = self.Max(2)
+                _,move = self.Max(3, -math.inf,math.inf)
                 if move == None:
                     print("ERROR")
                 else:
