@@ -60,11 +60,16 @@ class ChessBot:
         """Gets Players Move"""
         legal_moves = list(self.board.legal_moves)
         move = input("Your move: ")
+        if move == "Q" or "q":
+                return False
         while move not in [m.uci() for m in legal_moves]:
             print("Enter a valid move.")
             move = input("Your move: ")
+            if move == "Q" or "q":
+                return False
         self.board.push_uci(move)
         print(self.board)
+        return True
 
     def evalBoard(self): 
         """Get board score from white's perspective"""
@@ -128,7 +133,7 @@ class ChessBot:
                 best_score = score
                 best_move = move
                 if best_score > alpha:
-                    alpha = best_score #alpha is max, found amove tha
+                    alpha = best_score #alpha is max
                 if beta <= alpha: 
                     break #stop searching, min won't chose this        
         return best_score, best_move
@@ -136,8 +141,6 @@ class ChessBot:
     def game(self):
         """Gamplay, printing the board and checking for game over """
         while not self.board.is_game_over():
-            print(self.board)
-            print()
             current_turn_w =self.board.turn
             bot = (current_turn_w and self.bot_color == "w") or (not current_turn_w and self.bot_color == "b")
             if bot == True:
@@ -152,8 +155,13 @@ class ChessBot:
                     print(move.uci())
                     self.board.push(move)
             else:
-                self.human_play()
+                play = self.human_play()
+                if not play:
+                    break
+            print(self.board)
+            print()
             print("New FEN position: " + self.board.fen())
+            
             if self.board.is_game_over():
                 break
         print(self.board)
@@ -164,6 +172,8 @@ class ChessBot:
         self.today()
         self.computer_player()
         self.board_start_pos()
+        print("Press 'Q' to quit")
+        print(self.board)
         self.game()
 
 # Main method
