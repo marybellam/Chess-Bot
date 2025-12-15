@@ -60,13 +60,11 @@ class ChessBot:
         """Gets Players Move"""
         legal_moves = list(self.board.legal_moves)
         move = input("Your move: ")
-        if move == "Q" or "q":
-                return False
         while move not in [m.uci() for m in legal_moves]:
+            if move == "Q" or move == "q":
+                return False
             print("Enter a valid move.")
             move = input("Your move: ")
-            if move == "Q" or "q":
-                return False
         self.board.push_uci(move)
         print(self.board)
         return True
@@ -87,9 +85,7 @@ class ChessBot:
     def Min(self,depth:int,alpha:float, beta:float)-> tuple[int|float, Move|None]:
         """ Gets min of opponent's turn"""
         if self.board.is_checkmate():
-            #losing = ((self.board.turn and self.bot_color == "w") or (not self.board.turn and self.bot_color == "b"))
-            #return (-math.inf if losing else math.inf), None
-            return math.inf, None 
+            return math.inf, None # opponent is checkmated
         if depth == 0 or self.board.is_game_over():
             eval_score = self.evalBoard()
             if self.bot_color == "b":
@@ -114,8 +110,6 @@ class ChessBot:
     def Max(self,depth:int, alpha:float, beta:float) -> tuple[int|float, Move|None]:
         """Gets max of plater/bots turn"""
         if self.board.is_checkmate():
-            #losing = ((self.board.turn and self.bot_color == "w") or (not self.board.turn and self.bot_color == "b"))
-            #return (-math.inf if losing else math.inf),None #lost
             return -math.inf, None
         if depth == 0 or self.board.is_game_over():
             eval_score = self.evalBoard()
@@ -148,7 +142,7 @@ class ChessBot:
                 if self.bot_color == "b":
                     color_name = "black"
                 print("Bot (as",color_name,"): ") 
-                _,move = self.Max(3, -math.inf,math.inf)
+                _,move = self.Max(4, -math.inf,math.inf)
                 if move == None:
                     print("ERROR")
                 else:
@@ -156,12 +150,10 @@ class ChessBot:
                     self.board.push(move)
             else:
                 play = self.human_play()
-                if not play:
+                if play == False:
                     break
             print(self.board)
-            print()
             print("New FEN position: " + self.board.fen())
-            
             if self.board.is_game_over():
                 break
         print(self.board)
