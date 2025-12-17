@@ -6,12 +6,86 @@ from chess import Move
 # Chess Bot class
 class ChessBot:
     piece_values = {
-    chess.PAWN: 1,
-    chess.KNIGHT: 3,
-    chess.BISHOP: 3,
-    chess.ROOK: 5,
-    chess.QUEEN: 9,
+    chess.PAWN: 10,
+    chess.KNIGHT: 30,
+    chess.BISHOP: 30,
+    chess.ROOK: 50,
+    chess.QUEEN: 90,
     chess.KING: 0
+    }
+    
+    pawn_table = [
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+        5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,
+        1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0,
+        0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5,
+        0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0,
+        0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5,
+        0.5,  1.0, 1.0,  -2.0, -2.0,  1.0,  1.0,  0.5,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0
+    ]
+    
+    knight_table = [
+        -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0,
+        -4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0,
+        -3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0,
+        -3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0,
+        -3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0,
+        -3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0,
+        -4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0,
+        -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0
+    ]
+    
+    bishop_table = [
+        -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0,
+        -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0,
+        -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0,
+        -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0,
+        -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0,
+        -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,
+        -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0,
+        -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0
+    ]
+    rook_table = [
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+        0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5,
+        -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+        -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+        -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+        -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+        -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+        0.0,   0.0, 0.0,  0.5,  0.5,  0.0,  0.0,  0.0
+    ]
+    
+    queen_table = [
+        -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0,
+        -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0,
+        -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0,
+        -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5,
+        0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5,
+        -1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0,
+        -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0,
+        -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0
+    ]
+    
+    king_table = [
+        -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+        -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+        -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+        -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+        -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0,
+        -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0,
+        2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0 ,
+        2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0 
+    ]
+    
+    piece_pst = {
+        chess.PAWN: pawn_table,
+        chess.KNIGHT: knight_table,
+        chess.BISHOP: bishop_table,
+        chess.ROOK: rook_table,
+        chess.QUEEN: queen_table,
+        chess.KING: king_table
     }
 
     def __init__(self):
@@ -68,18 +142,24 @@ class ChessBot:
         self.board.push_uci(move)
         print(self.board)
         return True
-
+    
     def evalBoard(self): 
         """Get board score from white's perspective"""
-        score = 0
+        score:int|float = 0
         for square in chess.SQUARES:
             piece = self.board.piece_at(square) 
             if piece is not None:
                 val = self.piece_values[piece.piece_type]
+                pos_val = 0
                 if piece.color == chess.WHITE:
-                    score += val
+                    arr = self.piece_pst[piece.piece_type]
+                    pos_val:float = arr[chess.square_mirror(square)] #need to mirror the square
+                    score = score + val + pos_val
                 else:
-                    score -= val
+                    arr = self.piece_pst[piece.piece_type]
+                    pos_val:float = arr[square] #no need to mirror the square
+                    score = score - (val + pos_val)
+        print("score:",score)
         return score
     
     def Min(self,depth:int,alpha:float, beta:float)-> tuple[int|float, Move|None]:
@@ -91,7 +171,6 @@ class ChessBot:
             if self.bot_color == "b":
                 eval_score = -eval_score
             return eval_score, None
-            #return (eval_score if self.bot_color == "w" else -eval_score), None
         best_score:float|int = math.inf
         best_move = None
         for move in self.board.legal_moves: 
@@ -116,7 +195,6 @@ class ChessBot:
             if self.bot_color == "b":
                 eval_score = -eval_score
             return eval_score, None
-            #return (eval_score if self.bot_color == "w" else -eval_score), None
         best_score = -math.inf
         best_move = None
         for move in self.board.legal_moves: 
@@ -171,7 +249,11 @@ class ChessBot:
 # Main method
 def main():
     bot = ChessBot()
-    bot.play()
+    bot.board = chess.Board()
+    bot.board.push_uci('b2b4')
+    print(bot.board)
+    print(bot.evalBoard())
+    #bot.play()
     
 if __name__ == "__main__":
     main()
