@@ -142,10 +142,12 @@ class ChessBot:
         self.board.push_uci(move)
         print(self.board)
         return True
-    
+    def getMobility(self):
+        return self.board.legal_moves.count() * .05
     def evalBoard(self): 
         """Get board score from white's perspective"""
         score:int|float = 0
+        mobility = self.getMobility()
         for square in chess.SQUARES:
             piece = self.board.piece_at(square) 
             if piece is not None:
@@ -154,11 +156,11 @@ class ChessBot:
                 if piece.color == chess.WHITE:
                     arr = self.piece_pst[piece.piece_type]
                     pos_val:float = arr[chess.square_mirror(square)] #need to mirror the square
-                    score = score + val + pos_val
+                    score = score + val + pos_val + mobility
                 else:
                     arr = self.piece_pst[piece.piece_type]
                     pos_val:float = arr[square] #no need to mirror the square
-                    score = score - (val + pos_val)
+                    score = score - (val + pos_val + mobility)
         print("score:",score)
         return score
     
