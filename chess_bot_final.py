@@ -14,7 +14,7 @@ class ChessBot:
     chess.KING: 0
     }
     
-    pawn_table = [
+    pawn_table = [ #Piece-Square Table for Pawn
         0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
         5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,
         1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0,
@@ -79,7 +79,7 @@ class ChessBot:
         2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0 
     ]
     
-    piece_pst = {
+    piece_pst = { #linking tables wih pieces
         chess.PAWN: pawn_table,
         chess.KNIGHT: knight_table,
         chess.BISHOP: bishop_table,
@@ -92,9 +92,10 @@ class ChessBot:
         self.board = chess.Board()
         self.bot_color = None
         self.player_color = None
+        self.counter = 0
 
-    # Method to print current date & time
     def today(self):
+        """Print Current Date and Time"""
         now = datetime.now()
         time = now.strftime("%H:%M:%S")
         date = now.strftime("%d/%m/%y")
@@ -135,19 +136,16 @@ class ChessBot:
         legal_moves = list(self.board.legal_moves)
         move = input("Your move: ")
         while move not in [m.uci() for m in legal_moves]:
-            if move == "Q" or move == "q":
+            if move == "Q" or move == "q": #quit
                 return False
             print("Enter a valid move.")
             move = input("Your move: ")
         self.board.push_uci(move)
-        print(self.board)
         return True
-    def getMobility(self):
-        return self.board.legal_moves.count() * .05
+
     def evalBoard(self): 
         """Get board score from white's perspective"""
         score:int|float = 0
-        mobility = self.getMobility()
         for square in chess.SQUARES:
             piece = self.board.piece_at(square) 
             if piece is not None:
@@ -156,18 +154,27 @@ class ChessBot:
                 if piece.color == chess.WHITE:
                     arr = self.piece_pst[piece.piece_type]
                     pos_val:float = arr[chess.square_mirror(square)] #need to mirror the square
-                    score = score + val + pos_val + mobility
+                    score = score + val + pos_val #add value from table into score
                 else:
                     arr = self.piece_pst[piece.piece_type]
                     pos_val:float = arr[square] #no need to mirror the square
-                    score = score - (val + pos_val + mobility)
-        print("score:",score)
+                    score = score - (val + pos_val) #add value from table into score
+        #print("score:",score)
         return score
     
     def Min(self,depth:int,alpha:float, beta:float)-> tuple[int|float, Move|None]:
         """ Gets min of opponent's turn"""
+        self.counter += 1
         if self.board.is_checkmate():
-            return math.inf, None # opponent is checkmated
+            if self.board.turn == chess.WHITE:
+                score = -math.inf #white is checkmated
+            else:
+                score = math.inf #black is checkmated
+            if self.bot_color == "b":
+                score = -score
+            return score, None
+        if self.board.is_stalemate() or self.board.is_insufficient_material() or self.board.can_claim_draw():
+            return 0,None
         if depth == 0 or self.board.is_game_over():
             eval_score = self.evalBoard()
             if self.bot_color == "b":
@@ -190,8 +197,15 @@ class ChessBot:
     
     def Max(self,depth:int, alpha:float, beta:float) -> tuple[int|float, Move|None]:
         """Gets max of plater/bots turn"""
+        self.counter+=1
         if self.board.is_checkmate():
-            return -math.inf, None
+            if self.board.turn == chess.WHITE:
+                score = -math.inf #white is checkmated
+            else:
+                score = math.inf #black is checkmated
+            if self.bot_color == "b":
+                score = -score
+            return score, None
         if depth == 0 or self.board.is_game_over():
             eval_score = self.evalBoard()
             if self.bot_color == "b":
@@ -221,17 +235,19 @@ class ChessBot:
                 color_name = "white"
                 if self.bot_color == "b":
                     color_name = "black"
-                print("Bot (as",color_name,"): ") 
+                print("Bot (as",color_name,"):", end=" ")
+                self.counter = 0 
                 _,move = self.Max(4, -math.inf,math.inf)
                 if move == None:
                     print("ERROR")
                 else:
                     print(move.uci())
                     self.board.push(move)
+                #    print("counter",self.counter)
             else:
                 play = self.human_play()
                 if play == False:
-                    break
+                   break
             print(self.board)
             print("New FEN position: " + self.board.fen())
             if self.board.is_game_over():
@@ -251,11 +267,7 @@ class ChessBot:
 # Main method
 def main():
     bot = ChessBot()
-    bot.board = chess.Board()
-    bot.board.push_uci('b2b4')
-    print(bot.board)
-    print(bot.evalBoard())
-    #bot.play()
+    bot.play()
     
 if __name__ == "__main__":
     main()
